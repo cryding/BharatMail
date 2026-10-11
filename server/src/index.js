@@ -69,7 +69,7 @@ app.post('/v1/messages/send', sendLimiter, async (req, res) => {
   if (!hasValidToken(req.get('authorization'))) return res.status(401).json({ error: 'Unauthorized.' });
 
   const { to, subject, text } = req.body || {};
-  if (typeof to !== 'string' || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(to) ||
+  if (typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to) ||
       typeof subject !== 'string' || !subject.trim() ||
       typeof text !== 'string' || !text.trim()) {
     return res.status(400).json({ error: 'Valid to, subject and text are required.' });
