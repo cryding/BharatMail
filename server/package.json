@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "check": "node --check src/index.js"
   },
   "dependencies": {
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
+    "express-rate-limit": "latest",
     "helmet": "latest",
     "morgan": "latest",
     "nodemailer": "latest",
