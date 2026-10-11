@@ -18,6 +18,7 @@ No domain, hosting, database, or email provider has been purchased or provisione
 - `android/` — native Kotlin + Jetpack Compose starter
 - `server/` — Express API, SMTP outbound-send scaffold, PostgreSQL schema
 - `cloudflare-inbound/` — inbound-email implementation requirements
+- `.github/workflows/ci.yml` — build checks for web, API syntax, and Android
 
 ## Local development
 
@@ -30,7 +31,13 @@ No domain, hosting, database, or email provider has been purchased or provisione
 5. Apply `schema.sql` to your PostgreSQL database.
 6. Run `npm run dev`.
 
-The `/health` endpoint reports process health. The `/ready` endpoint reports whether database and SMTP configuration are present. A successful readiness check does not by itself prove that email delivery works.
+The `/health` endpoint reports process health. The `/ready` endpoint reports whether database and SMTP configuration are present, sending is enabled, and a temporary server token is configured. A successful readiness check does not prove that delivery works.
+
+### Outbound sending security gate
+
+Sending is disabled by default: `SMTP_SEND_ENABLED=false`. The starter's temporary server-to-server gate requires `SMTP_SEND_ENABLED=true` and a `SEND_API_TOKEN` of at least 32 characters. Requests must include `Authorization: Bearer <token>`. A rate limit is also enabled.
+
+**This token gate is not end-user authentication. Never place the token in a browser app, Android APK, or public repository.** The web UI does not include this secret and therefore will not send through this gate. Before public use, replace the temporary gate with verified accounts, per-user authorization, quotas, abuse prevention, and audit logging.
 
 ### Web
 
@@ -40,11 +47,20 @@ The `/health` endpoint reports process health. The `/ready` endpoint reports whe
 4. Set `VITE_API_BASE_URL=http://localhost:8080`.
 5. Run `npm run dev`.
 
-The UI's message list is sample data. The compose screen can call the API endpoint, but actual sending requires valid SMTP configuration.
+The UI's message list is sample data. Live inbox fetching and user authentication are not implemented.
 
 ### Android
 
-Open `android/` in Android Studio with JDK 17 and a compatible Android SDK, sync Gradle, then run on an emulator. The default API URL points to the Android emulator host. Configure an HTTPS API endpoint before any remote or public testing. The current compose UI is a prototype and does not yet authenticate users or fetch a live mailbox.
+Open `android/` in Android Studio with JDK 17 and a compatible Android SDK, sync Gradle, then run on an emulator. The default API URL points to the Android emulator host. Cleartext traffic is allowed only in the debug manifest; the main manifest disables it. Configure an HTTPS API endpoint before any remote or public testing. The current Compose UI is a prototype and does not yet authenticate users or fetch a live mailbox.
+
+## CI
+
+GitHub Actions is configured to attempt:
+- Web dependency installation and production build
+- API dependency installation and JavaScript syntax check
+- Android debug APK compilation with JDK 17
+
+A workflow being committed does not mean it has passed. Check the repository's Actions tab for the actual run result.
 
 ## Strict ₹0 budget
 
